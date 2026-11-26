@@ -25,7 +25,7 @@
   <div id="toast" class="toast"><i class="toast-dot"></i><span id="toastText">저장되었습니다.</span></div>
   <script>
     (()=>{
-      const KEY='lab-note-v1';
+      const KEY='lab-note-v1', SEED_KEY='lab-note-seeded-v1';
       const CHECKS=['참고자료의 출처를 확인했는가?','조교가 강조한 사항을 레포트에 반영했는가?','실제 실험에서 변경된 내용을 반영했는가?','실험 결과와 오차원인을 검토했는가?'];
       const TYPES=['교재','논문','웹사이트','기타'];
       const seeds=[
@@ -36,8 +36,8 @@
       let data=load(), view='list', activeId=null, tab='resources', editingId=null, toastTimer;
       const app=document.getElementById('app'), modalRoot=document.getElementById('modalRoot');
       function uid(){return 'e_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,8)}
-      function load(){try{let raw=localStorage.getItem(KEY);if(raw){let parsed=JSON.parse(raw);if(Array.isArray(parsed))return parsed}}catch(e){}return seeds.map((x,i)=>({...x,id:'sample_'+i,createdAt:Date.now()-(i*86400000),updatedAt:Date.now()-(i*86400000)}))}
-      function save(silent=false){try{localStorage.setItem(KEY,JSON.stringify(data));if(!silent)toast('저장되었습니다.')}catch(e){toast('저장에 실패했습니다. 다시 시도해주세요.',true);return false}return true}
+      function load(){try{let raw=localStorage.getItem(KEY),parsed=raw?JSON.parse(raw):null;if(Array.isArray(parsed)&&parsed.length)return parsed;if(localStorage.getItem(SEED_KEY)==='1')return [];localStorage.setItem(SEED_KEY,'1')}catch(e){}return seeds.map((x,i)=>({...x,id:'sample_'+i,createdAt:Date.now()-(i*86400000),updatedAt:Date.now()-(i*86400000)}))}
+      function save(silent=false){try{localStorage.setItem(KEY,JSON.stringify(data));localStorage.setItem(SEED_KEY,'1');if(!silent)toast('저장되었습니다.')}catch(e){toast('저장에 실패했습니다. 다시 시도해주세요.',true);return false}return true}
       function esc(v=''){return String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
       function date(ts){return new Intl.DateTimeFormat('ko-KR',{month:'short',day:'numeric'}).format(new Date(ts||Date.now()))}
       function fullDate(ts){return new Intl.DateTimeFormat('ko-KR',{year:'numeric',month:'long',day:'numeric'}).format(new Date(ts||Date.now()))}
